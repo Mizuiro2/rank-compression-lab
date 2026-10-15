@@ -1,0 +1,15 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  cpu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pytest -q
+      - name: End-to-end small experiment
+        run: rank-compress train --queries 96 --candidates 16 --epochs 2 --finetune-epochs 1 --warmup 2 --repetitions 5 --report artifacts/ci-report.json
